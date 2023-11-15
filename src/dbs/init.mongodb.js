@@ -1,7 +1,9 @@
 'use strict';
 
 const mongoose = require('mongoose');
-const connectString = 'mongodb://localhost:27017/beecommerce';
+const config = require('../configs/config.mongodb');
+
+const connectString = `mongodb://${config.db.host}:${config.db.port}/${config.db.name}`;
 const { countConnect, checkOverflowConnections } = require('../helpers/check.connect');
 
 class Database {
