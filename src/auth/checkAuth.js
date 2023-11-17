@@ -18,10 +18,7 @@ const apiKey = async (req, res, next) => {
     // check objKey
     const objKey = await ApiKeyService.findApiKey({ key });
     if (!objKey) {
-      return res.status(401).json({
-        code: '100001',
-        message: 'Unauthorized',
-      });
+      throw new UnauthorizedError('Unauthorized');
     }
     req.objKey = objKey;
     return next();
@@ -32,22 +29,23 @@ const permissionKey = (permission) => {
   return (req, res, next) => {
     const objKey = req.objKey;
     if (!objKey.permissions) {
-      return res.status(401).json({
-        code: '100001',
-        message: 'Unauthorized',
-      });
+      throw new UnauthorizedError('Unauthorized');
     }
     if (!objKey.permissions.includes(permission)) {
-      return res.status(401).json({
-        code: '100001',
-        message: 'Unauthorized',
-      });
+      throw new UnauthorizedError('Unauthorized');
     }
     return next();
+  };
+};
+
+const asyncHandler = (fn) => {
+  return (req, res, next) => {
+    fn(req, res, next).catch(next);
   };
 };
 
 module.exports = {
   apiKey,
   permissionKey,
+  asyncHandler,
 };

@@ -19,13 +19,24 @@ app.use(
 require('./dbs/init.mongodb');
 
 // init routes
-// app.get('/', (req, res, next) => {
-//   return res.status(200).json({
-//     message: 'Hello World'.repeat(100000),
-//   });
-// });
+
 app.use('', require('./routes'));
 
 // init error handler
+app.use((req, res, next) => {
+  const error = new Error('Not found');
+  error.status = 404;
+  next(error);
+});
+
+app.use((err, req, res, next) => {
+  return res.status(err.status || 500).json({
+    error: {
+      status: 'error',
+      code: err.status || 500,
+      message: err.message,
+    },
+  });
+});
 
 module.exports = app;

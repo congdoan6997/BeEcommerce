@@ -10,11 +10,7 @@ router.use(apiKey);
 // check permission
 router.use(permissionKey('0000'));
 
+// routes
 router.use('/v1/api', require('./access'));
-// router.get('/', (req, res, next) => {
-//     res.status(200).json({
-//         message: 'Hello World',
-//     })
-// })
 
 module.exports = router;
