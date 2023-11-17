@@ -4,9 +4,10 @@
 
 POST {{url_dev}}/user/signUp
 Content-Type: application/json
+x-api-key: de72c84ed3042e5aaddc576309598c1b9f976428de03e702a6f2d28de7e9386935f92a980234fa805f964f4125b1c0a1c24651e4fbcc68d59cb0592d280526bf
 
 {
     "name":"PhDBui",
-    "email": "bui4@gmail.com",
+    "email": "bui@gmail.com",
     "password": "abc123" 
 }
