@@ -9,4 +9,5 @@ const { asyncHandler } = require('../../auth/checkAuth');
 
 router.post('/user/signup', asyncHandler(accessController.signup));
 
+router.post('/user/login', asyncHandler(accessController.login));
 module.exports = router;

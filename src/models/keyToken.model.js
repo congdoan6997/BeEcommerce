@@ -14,9 +14,18 @@ var keyTokenSchema = new Schema(
       type: String,
       required: true,
     },
-    refreshToken: {
+    // level 1 add private key
+    privateKey: {
+      type: String,
+      required: true,
+    },
+    refreshTokenUsed: {
       type: Array,
-      default: [],
+      default: [], // nhung refresh token da duoc su dung
+    },
+    refreshToken: {
+      type: String,
+      required: true,
     },
   },
   {

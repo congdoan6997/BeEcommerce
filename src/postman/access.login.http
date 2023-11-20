@@ -1,15 +1,12 @@
 @url_dev = http://localhost:3055/v1/api/
 
-### signUp
+### login
 
-POST {{url_dev}}/user/signup
+POST {{url_dev}}/user/login
 Content-Type: application/json
 x-api-key: 126aa197cb7f74401a591c4d6dabb05f05595edf23b814d5a505ecc651468bed0ddc64772949882ce7e98dfbb182c7d60a15b39e8d1ce51161deb0f269f12d02
 
 {
-    "name":"PhDBui",
     "email": "bui11@gmail.com",
     "password": "abc123" 
 }
-
-GET {{{{url_dev}}}}/user/login
