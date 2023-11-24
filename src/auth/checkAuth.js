@@ -22,7 +22,9 @@ const apiKey = async (req, res, next) => {
     }
     req.objKey = objKey;
     return next();
-  } catch (error) {}
+  } catch (error) {
+    throw error;
+  }
 };
 
 const permissionKey = (permission) => {
@@ -38,14 +40,7 @@ const permissionKey = (permission) => {
   };
 };
 
-const asyncHandler = (fn) => {
-  return (req, res, next) => {
-    fn(req, res, next).catch(next);
-  };
-};
-
 module.exports = {
   apiKey,
   permissionKey,
-  asyncHandler,
 };

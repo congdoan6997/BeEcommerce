@@ -2,7 +2,7 @@
 
 const User = require('../models/user.model');
 
-const findByMail = async (
+const findUserByMail = async (
   email,
   select = {
     email: 1,
@@ -14,7 +14,11 @@ const findByMail = async (
 ) => {
   return await User.findOne({ email }).select(select).lean();
 };
+const findUserById = async (userId, select = {}) => {
+  return await User.findById(userId).select(select).lean();
+};
 
 module.exports = {
-  findByMail,
+  findUserById,
+  findUserByMail,
 };
