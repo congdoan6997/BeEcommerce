@@ -7,7 +7,7 @@ const KeyTokenService = require('./keyToken.service');
 const { createTokenPair } = require('../auth/authUtils');
 const { getInfoData } = require('../utils/index');
 const { BadRequestError, UnauthorizedError } = require('../core/error.response');
-const { findByMail } = require('./user.service');
+const { findUserByMail } = require('./user.service');
 
 const RoleUsers = {
   SHOP: 'SHOP',
@@ -17,9 +17,14 @@ const RoleUsers = {
 };
 
 class AccessService {
+  static async logout({ keyStore }) {
+    // console.log('keyStore::', keyStore);
+    const delKey = await KeyTokenService.removeKeyTokenById({ id: keyStore._id });
+    return delKey;
+  }
   static async login({ email, password }) {
     // 1. Check exist email
-    const holderUser = await findByMail(email);
+    const holderUser = await findUserByMail(email);
     if (!holderUser) {
       throw new BadRequestError('User not registered');
     }
@@ -54,7 +59,7 @@ class AccessService {
     return {
       code: 201,
       metadata: {
-        shop: getInfoData({ fields: ['_id', 'name', 'email'], object: holderUser }),
+        user: getInfoData({ fields: ['_id', 'name', 'email'], object: holderUser }),
         tokens,
       },
     };
@@ -75,21 +80,6 @@ class AccessService {
     });
 
     if (newUser) {
-      // create privateKey and publicKey
-      // level xxx
-      // const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
-      //   modulusLength: 4096,
-      //   publicKeyEncoding: {
-      //     type: 'pkcs1',
-      //     format: 'pem',
-      //   },
-      //   privateKeyEncoding: {
-      //     type: 'pkcs1',
-      //     format: 'pem',
-      //   },
-      // });
-      // console.log('newUser::', newUser);
-      // level 1
       const privateKey = crypto.randomBytes(64).toString('hex');
       const publicKey = crypto.randomBytes(64).toString('hex');
       console.log('privateKey::', privateKey);
@@ -105,12 +95,6 @@ class AccessService {
       if (!keyStore) {
         throw new BadRequestError('Can not create public key');
       }
-      // level xxx
-      // console.log('PublicKeyString::', publicKeyString);
-      // const publicKeyObject = crypto.createPublicKey(publicKeyString);
-
-      // console.log('PublicKeyObject::', publicKeyObject);
-
       const tokens = createTokenPair(
         {
           userId: newUser._id,

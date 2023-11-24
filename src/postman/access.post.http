@@ -12,4 +12,3 @@ x-api-key: 126aa197cb7f74401a591c4d6dabb05f05595edf23b814d5a505ecc651468bed0ddc6
     "password": "abc123" 
 }
 
-GET {{{{url_dev}}}}/user/login
