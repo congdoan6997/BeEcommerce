@@ -20,6 +20,19 @@ class KeyTokenService {
       throw new BadRequestError(`Create key token:: ${error.message}`);
     }
   };
+  static updateKeyToken = async ({ id, refreshToken, refreshTokenUsed }) => {
+    const filter = { user: id };
+    const update = {
+      $set: {
+        refreshToken,
+      },
+      $addToSet: {
+        refreshTokenUsed,
+      },
+    };
+    const options = { new: true };
+    return await keyTokenModel.findOneAndUpdate(filter, update, options);
+  };
   static removeKeyTokenById = async ({ id }) => {
     return await keyTokenModel.findByIdAndDelete(id).lean();
   };
@@ -28,6 +41,12 @@ class KeyTokenService {
     const userId = new Types.ObjectId(user);
     // console.lof('userId2::', userId);
     return await keyTokenModel.findOne({ user: userId }).lean();
+  };
+  static findKeyTokenByRefreshToken = async ({ refreshToken }) => {
+    return await keyTokenModel.findOne({ refreshToken }).lean();
+  };
+  static findKeyTokenByRefreshTokenUsed = async ({ refreshTokenUsed }) => {
+    return await keyTokenModel.findOne({ refreshTokenUsed }).lean();
   };
 }
 

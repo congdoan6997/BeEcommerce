@@ -15,4 +15,5 @@ router.use(authentication);
 
 // logout
 router.post('/user/logout', asyncHandler(accessController.logout));
+router.post('/user/refreshToken', asyncHandler(accessController.refreshToken));
 module.exports = router;
