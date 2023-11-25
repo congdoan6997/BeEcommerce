@@ -120,6 +120,7 @@ const authenticationV2 = asyncHandler(async (req, res, next) => {
 
     if (userId !== decodeUser.userId) throw new UnauthorizedError('Invalid request 5');
     req.keyStore = keyStore;
+    req.user = decodeUser;
     // console.log('keyStore::', keyStore);
     return next();
   } catch (error) {
