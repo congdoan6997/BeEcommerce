@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 // const crypto = require('crypto');
 const crypto = require('node:crypto');
 const KeyTokenService = require('./keyToken.service');
-const { createTokenPair, verifyJWTByRefreshToken } = require('../auth/authUtils');
+const { createTokenPair, verifyJWT } = require('../auth/authUtils');
 const { getInfoData } = require('../utils/index');
 const { BadRequestError, UnauthorizedError } = require('../core/error.response');
 const { findUserByMail, findUserById } = require('./user.service');
@@ -24,7 +24,7 @@ class AccessService {
       refreshTokenUsed: refreshToken,
     });
     if (keyTokenUsed) {
-      const { userId, email } = verifyJWTByRefreshToken(refreshToken, keyTokenUsed.privateKey);
+      const { userId, email } = verifyJWT(refreshToken, keyTokenUsed.privateKey);
       KeyTokenService.removeKeyTokenById({ id: keyTokenUsed._id });
       throw new BadRequestError('Refresh token used');
     }
@@ -34,10 +34,11 @@ class AccessService {
       throw new BadRequestError('Refresh token not found');
     }
     // verify jwt token
-    const { userId, email } = verifyJWTByRefreshToken(refreshToken, keyToken.privateKey);
+    const { userId, email } = verifyJWT(refreshToken, keyToken.privateKey);
     console.log('userId::', userId);
     // find user
     const user = await findUserByMail(email);
+
     if (!user) {
       throw new BadRequestError('User not found');
     }
@@ -50,15 +51,7 @@ class AccessService {
       keyToken.publicKey,
       keyToken.privateKey
     );
-    // update token
-    // await keyToken.update({
-    //   $set: {
-    //     refreshToken: tokens.refreshToken,
-    //   },
-    //   $addToSet: {
-    //     refreshTokenUsed: refreshToken,
-    //   },
-    // });
+
     await KeyTokenService.updateKeyToken({
       id: user._id,
       refreshToken: tokens.refreshToken,
@@ -68,6 +61,51 @@ class AccessService {
     return {
       user: {
         userId,
+        email,
+      },
+      tokens,
+    };
+  };
+  static handlerRefreshTokenV2 = async ({ keyStore, user, refreshToken }) => {
+    const { userId, email } = user;
+    console.log('keyStore::', keyStore);
+    console.log('user::', user);
+    // console.log('refreshToken::', refreshToken);
+    // find key token used
+    if (keyStore.refreshTokenUsed.includes(refreshToken)) {
+      KeyTokenService.removeKeyTokenById({ id: keyStore._id });
+      throw new BadRequestError('Refresh token used');
+    }
+
+    // find key token
+    if (keyStore.refreshToken !== refreshToken) {
+      throw new BadRequestError('Refresh token not found');
+    }
+    // find user by email
+    const userFound = await findUserByMail(email);
+    console.log('userFound::', userFound);
+    if (userId !== userFound._id.toString()) {
+      throw new BadRequestError('User not found');
+    }
+    //create new access token
+    const tokens = createTokenPair(
+      {
+        userId: userFound._id,
+        email,
+      },
+      keyStore.publicKey,
+      keyStore.privateKey
+    );
+
+    await KeyTokenService.updateKeyToken({
+      id: userFound._id,
+      refreshToken: tokens.refreshToken,
+      refreshTokenUsed: refreshToken,
+    });
+
+    return {
+      user: {
+        userId: userFound._id,
         email,
       },
       tokens,

@@ -34,6 +34,7 @@ app.use((err, req, res, next) => {
     error: {
       status: 'error',
       code: err.status || 500,
+      stack: err.stack, // for dev check error
       message: err.message,
     },
   });
