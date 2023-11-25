@@ -84,6 +84,7 @@ const authenticationV2 = asyncHandler(async (req, res, next) => {
   5. check keyStore with this userId
   6. ok all return next()
   */
+  //  console.log('check authen');
   // 1
   const userId = req.headers[HEADER.CLIENT_ID];
   if (!userId) throw new UnauthorizedError('Invalid request 1');
@@ -119,6 +120,7 @@ const authenticationV2 = asyncHandler(async (req, res, next) => {
 
     if (userId !== decodeUser.userId) throw new UnauthorizedError('Invalid request 5');
     req.keyStore = keyStore;
+    // console.log('keyStore::', keyStore);
     return next();
   } catch (error) {
     throw error;
