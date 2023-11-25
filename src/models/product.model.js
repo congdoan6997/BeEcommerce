@@ -58,6 +58,10 @@ var electronicSchema = new Schema(
       type: String,
       required: true,
     },
+    product_user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
   },
   {
     timestamps: true,
@@ -74,6 +78,10 @@ var furnitureSchema = new Schema(
     size: {
       type: String,
       required: true,
+    },
+    product_user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
     },
   },
   {
@@ -95,6 +103,10 @@ var clothingSchema = new Schema(
     material: {
       type: String,
       required: true,
+    },
+    product_user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
     },
   },
   {
