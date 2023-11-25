@@ -3,19 +3,30 @@ const { BadRequestError } = require('../core/error.response');
 const { product, clothing, electronic, furniture } = require('../models/product.model');
 
 class ProductFactory {
+  static productRegister = {};
+
+  static registerProduct(type, product) {
+    this.productRegister[type] = product;
+  }
   static async createProduct(type, payload) {
-    // console.log('type::', type);
-    // console.log('payload::', payload);
-    switch (type) {
-      case 'Clothing':
-        return await new Clothing(payload).createProduct();
-      case 'Electronics':
-        return await new Electronic(payload).createProduct();
-      case 'Furniture':
-        return await new Furniture(payload).createProduct();
-      default:
-        throw new BadRequestError('Invalid product type');
+    //level xxx  Factory and Strategy Pattern
+    if (!this.productRegister[type]) {
+      throw new BadRequestError('Invalid product type');
     }
+    const Product = this.productRegister[type];
+    return new Product(payload).createProduct();
+
+    //level 0
+    // switch (type) {
+    //   case 'Clothing':
+    //     return await new Clothing(payload).createProduct();
+    //   case 'Electronics':
+    //     return await new Electronic(payload).createProduct();
+    //   case 'Furniture':
+    //     return await new Furniture(payload).createProduct();
+    //   default:
+    //     throw new BadRequestError('Invalid product type');
+    // }
   }
 }
 
@@ -95,5 +106,9 @@ class Furniture extends Product {
     return newProduct;
   }
 }
+// register factory pattern
+ProductFactory.registerProduct('Clothing', Clothing);
+ProductFactory.registerProduct('Electronics', Electronic);
+ProductFactory.registerProduct('Furniture', Furniture);
 
 module.exports = ProductFactory;
