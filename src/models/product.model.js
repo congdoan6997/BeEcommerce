@@ -1,4 +1,5 @@
 const { model, Schema } = require('mongoose'); // Erase if already required
+const slugify = require('slugify');
 
 const DOCUMENT_NAME = 'Product';
 const COLLECTION_NAME = 'Products';
@@ -14,6 +15,9 @@ var productSchema = new Schema(
       required: true,
     },
     product_description: {
+      type: String,
+    },
+    product_slug: {
       type: String,
     },
     product_price: {
@@ -37,12 +41,48 @@ var productSchema = new Schema(
       type: Schema.Types.Mixed,
       required: true,
     },
+    /// more
+    product_ratingAverage: {
+      type: Number,
+      default: 4.5,
+      min: [1, 'Rating must be above or equal 1.0'],
+      max: [5, 'Rating must be below or equal 5.0'],
+      // 3.412312
+      set: (val) => Math.round(val * 10) / 10,
+    },
+    product_variations: {
+      type: Array,
+      default: [],
+    },
+    isDaft: {
+      type: Boolean,
+      default: true,
+      index: true,
+      select: false,
+    },
+    isPublished: {
+      type: Boolean,
+      default: false,
+      index: true,
+      select: false,
+    },
   },
   {
     timestamps: true,
     collection: COLLECTION_NAME,
   }
 );
+
+// index text
+productSchema.index({ product_name: 'text', product_description: 'text' });
+
+// document middlewares
+productSchema.pre('save', function (next) {
+  this.product_slug = slugify(this.product_name, {
+    lower: true,
+  });
+  next();
+});
 
 var electronicSchema = new Schema(
   {
