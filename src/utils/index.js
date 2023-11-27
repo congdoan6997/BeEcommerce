@@ -5,7 +5,16 @@ const _ = require('lodash');
 const getInfoData = ({ fields = [], object = {} }) => {
   return _.pick(object, fields);
 };
+const getSelectData = ({ select = [] }) => {
+  return Object.fromEntries(select.map((item) => [item, 1]));
+};
+const getUnSelectData = ({ unSelect = [] }) => {
+  // console.log('select in util::', unSelect)
+  return Object.fromEntries(unSelect.map((item) => [item, 0]));
+};
 
 module.exports = {
   getInfoData,
+  getSelectData,
+  getUnSelectData,
 };
