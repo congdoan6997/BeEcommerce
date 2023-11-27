@@ -12,6 +12,8 @@ const {
   updateProduct,
 } = require('../models/repositories/product.repo');
 
+const { insertInventory } = require('../models/repositories/inventory.repo');
+
 const { removeUndefinedObject, updateNestedObjectParser } = require('../utils/index');
 
 class ProductFactory {
@@ -109,7 +111,19 @@ class Product {
   }
 
   async createProduct(product_id) {
-    return product.create({ ...this, _id: product_id });
+    const newProduct = product.create({ ...this, _id: product_id });
+    if (!newProduct) {
+      throw new BadRequestError('Create product failed');
+    }
+    const newInventory = await insertInventory({
+      product_id: newProduct._id,
+      userId: this.product_user,
+      stock: this.product_quantity,
+    });
+    if (!newInventory) {
+      throw new BadRequestError('Create inventory failed');
+    }
+    return newProduct;
   }
 
   async updateProduct(product_id, bodyUpdate) {
