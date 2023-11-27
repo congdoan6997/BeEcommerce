@@ -148,6 +148,22 @@ const findOneProduct = async ({ product_id, unSelect }) => {
     .exec();
   return results;
 };
+
+/**ß
+ * Updates a product in the database.
+ *
+ * @param {Object} options - The options object.
+ * @param {string} options.product_id - The ID of the product to update.
+ * @param {Object} options.bodyUpdate - The update object containing the new values for the product.
+ * @param {Model} options.model - The model used to update the product.
+ * @param {boolean} [options.isNew=true] - A flag indicating whether to return the updated product or the original product.
+ * @return {Promise<Object>} A promise that resolves to the updated product.
+ */
+const updateProduct = async ({ product_id, bodyUpdate, model, isNew = true }) => {
+  return await model.findByIdAndUpdate(product_id, bodyUpdate, {
+    new: isNew,
+  });
+};
 module.exports = {
   findAllDraftsProduct,
   findAllPublishProduct,
@@ -156,4 +172,5 @@ module.exports = {
   findProductBySearch,
   findAllProducts,
   findOneProduct,
+  updateProduct,
 };

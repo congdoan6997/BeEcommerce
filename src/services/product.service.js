@@ -9,7 +9,10 @@ const {
   findProductBySearch,
   findAllProducts,
   findOneProduct,
+  updateProduct,
 } = require('../models/repositories/product.repo');
+
+const { removeUndefinedObject, updateNestedObjectParser } = require('../utils/index');
 
 class ProductFactory {
   static productRegister = {};
@@ -24,18 +27,14 @@ class ProductFactory {
     }
     const Product = this.productRegister[type];
     return new Product(payload).createProduct();
+  }
 
-    //level 0
-    // switch (type) {
-    //   case 'Clothing':
-    //     return await new Clothing(payload).createProduct();
-    //   case 'Electronics':
-    //     return await new Electronic(payload).createProduct();
-    //   case 'Furniture':
-    //     return await new Furniture(payload).createProduct();
-    //   default:
-    //     throw new BadRequestError('Invalid product type');
-    // }
+  static async updateProduct(type, product_id, payload) {
+    if (!this.productRegister[type]) {
+      throw new BadRequestError('Invalid product type');
+    }
+    const Product = this.productRegister[type];
+    return new Product(payload).updateProduct(product_id);
   }
 
   // find all drafts product for a user
@@ -112,6 +111,14 @@ class Product {
   async createProduct(product_id) {
     return product.create({ ...this, _id: product_id });
   }
+
+  async updateProduct(product_id, bodyUpdate) {
+    return await updateProduct({
+      product_id,
+      bodyUpdate,
+      model: product,
+    });
+  }
 }
 
 class Clothing extends Product {
@@ -128,6 +135,18 @@ class Clothing extends Product {
       throw new BadRequestError('Create product failed');
     }
     return newProduct;
+  }
+
+  async updateProduct(product_id) {
+    const objectParams = this;
+    if (objectParams.product_attributes) {
+      await updateProduct({
+        product_id,
+        bodyUpdate: objectParams.product_attributes,
+        model: clothing,
+      });
+    }
+    return await super.updateProduct(product_id, objectParams);
   }
 }
 
@@ -146,6 +165,17 @@ class Electronic extends Product {
     }
     return newProduct;
   }
+  async updateProduct(product_id) {
+    const objectParams = this;
+    if (objectParams.product_attributes) {
+      await updateProduct({
+        product_id,
+        bodyUpdate: objectParams.product_attributes,
+        model: electronic,
+      });
+    }
+    return await super.updateProduct(product_id, objectParams);
+  }
 }
 
 class Furniture extends Product {
@@ -162,6 +192,21 @@ class Furniture extends Product {
       throw new BadRequestError('Create product failed');
     }
     return newProduct;
+  }
+  async updateProduct(product_id) {
+    // const objectParams = updateNestedObjectParser(this);
+    const objectParams = this;
+    // console.log('objectParams::', objectParams);
+    const newObjectParams = removeUndefinedObject(objectParams);
+    // console.log('newObjectParams::', newObjectParams);
+    if (objectParams.product_attributes) {
+      await updateProduct({
+        product_id,
+        bodyUpdate: updateNestedObjectParser(newObjectParams.product_attributes),
+        model: furniture,
+      });
+    }
+    return await super.updateProduct(product_id, updateNestedObjectParser(newObjectParams));
   }
 }
 
