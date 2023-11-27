@@ -7,6 +7,8 @@ const {
   publishProductByUser,
   unPublishProductByUser,
   findProductBySearch,
+  findAllProducts,
+  findOneProduct,
 } = require('../models/repositories/product.repo');
 
 class ProductFactory {
@@ -62,6 +64,27 @@ class ProductFactory {
   }
   static async findProductBySearch({ keySearch }) {
     return await findProductBySearch({ keySearch });
+  }
+
+  static async findAllProducts({
+    limit = 50,
+    sort = 'ctime',
+    page = 1,
+    filter = { isPublished: true },
+    select = ['product_name', 'product_price', 'product_thumb'],
+  }) {
+    return await findAllProducts({
+      limit,
+      sort,
+      page,
+      filter,
+      select: select,
+    });
+  }
+  static async findOneProduct({ product_id }) {
+    console.log('product_id::', product_id);
+    // console.log('unSelect::', unSelect)
+    return await findOneProduct({ product_id, unSelect: ['__v'] });
   }
 }
 
@@ -141,6 +164,7 @@ class Furniture extends Product {
     return newProduct;
   }
 }
+
 // register factory pattern
 ProductFactory.registerProduct('Clothing', Clothing);
 ProductFactory.registerProduct('Electronics', Electronic);

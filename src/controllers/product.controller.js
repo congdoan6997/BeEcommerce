@@ -76,6 +76,23 @@ class ProductController {
       }),
     }).send(res);
   }
+
+  async findAllProducts(req, res, next) {
+    new OkSuccessResponse({
+      message: 'Find all products successfully',
+      metadata: await ProductService.findAllProducts({
+        ...req.query,
+      }),
+    }).send(res);
+  }
+  async findOneProduct(req, res, next) {
+    new OkSuccessResponse({
+      message: 'Find one product successfully',
+      metadata: await ProductService.findOneProduct({
+        product_id: req.params.product_id,
+      }),
+    }).send(res);
+  }
 }
 
 module.exports = new ProductController();
