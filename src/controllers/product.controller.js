@@ -21,6 +21,15 @@ class ProductController {
       }),
     }).send(res);
   }
+  async updateProduct(req, res, next) {
+    new OkSuccessResponse({
+      message: 'Update product successfully',
+      metadata: await ProductService.updateProduct(req.body.product_type, req.params.product_id, {
+        ...req.body,
+        product_user: req.user.userId,
+      }),
+    }).send(res);
+  }
 
   /**
    * Asynchronously finds all drafts products.
